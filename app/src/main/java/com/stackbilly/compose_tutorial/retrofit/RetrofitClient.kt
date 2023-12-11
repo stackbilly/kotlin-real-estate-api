@@ -14,7 +14,7 @@ object RetrofitClient {
     fun getApiService(context: Context):ApiService{
         if (!::apiService.isInitialized){
             val retrofit = Retrofit.Builder()
-                .baseUrl("https://cd13-154-79-142-87.ngrok-free.app/")
+                .baseUrl("https://1094-102-7-57-23.ngrok-free.app/")
                 .addConverterFactory(GsonConverterFactory.create())
                 .addConverterFactory(ScalarsConverterFactory.create())
                 .client(okhttpClient(context))
