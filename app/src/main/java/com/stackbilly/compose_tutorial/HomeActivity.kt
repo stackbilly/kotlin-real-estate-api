@@ -2,15 +2,31 @@ package com.stackbilly.compose_tutorial
 
 import android.util.Log
 import android.widget.Toast
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.LocationOn
 import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material.icons.outlined.Notifications
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CenterAlignedTopAppBar
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -24,8 +40,11 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.nestedscroll.nestedScroll
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.Font
@@ -34,6 +53,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import coil.compose.AsyncImage
 import com.google.gson.Gson
 import com.stackbilly.compose_tutorial.models.ApiHouseResponse
 import com.stackbilly.compose_tutorial.models.Houses
@@ -118,11 +138,7 @@ fun ScrollContent(innerPadding: PaddingValues){
                 response: Response<ApiHouseResponse>
             ) {
                 if (response.isSuccessful) {
-                    val body = response.body()?.toString()
-                    val gson = Gson()
-                    housesData = gson.fromJson(body, Array<Houses>::class.java).toList()
-
-                    Toast.makeText(ctx, "Retrieved houses successfully", Toast.LENGTH_SHORT).show()
+                    housesData = response.body()!!.results
                     Log.e("Real Estate", "$housesData")
                 }else{
                     Toast.makeText(ctx, response.message(), Toast.LENGTH_SHORT).show()
@@ -133,9 +149,102 @@ fun ScrollContent(innerPadding: PaddingValues){
                 Log.e("Real Estate", "onFailure ${t.message}")
             }
         })
-    LazyColumn{
-        items(housesData){house ->
-            house.name?.let { Text(text = it) }
+    LazyColumn(
+        modifier = Modifier
+            .padding(top = 60.dp)
+    ){
+        itemsIndexed(housesData){index, house ->
+            if (housesData.isEmpty()){
+                Box(
+                    modifier = Modifier.fillMaxSize(),
+                    contentAlignment = Alignment.Center
+                ) {
+                    CircularProgressIndicator(
+                        modifier = Modifier.width(5.dp),
+                        color = MaterialTheme.colorScheme.primary,
+                    )
+                }
+            }else{
+                HouseCard(houses = housesData[index])
+            }
+        }
+    }
+}
+
+@Composable
+fun HouseCard(houses:Houses){
+    Card(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(15.dp),
+        shape = RoundedCornerShape(5),
+        colors = CardDefaults.cardColors(Color.White),
+        elevation = CardDefaults.cardElevation(12.dp)
+    ) {
+        Column(
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Center
+        ) {
+            AsyncImage(
+                model = houses.Image, 
+                contentDescription = houses.Name,
+                modifier = Modifier
+                    .fillMaxWidth(),
+                contentScale = ContentScale.Crop
+            )
+            Text(
+                text = houses.Name.split("with")[0],
+                overflow = TextOverflow.Clip,
+                style = TextStyle(
+                    fontWeight = FontWeight.Medium,
+                    fontFamily = fontFamily,
+                    color = MaterialTheme.colorScheme.tertiary,
+                    fontSize = 15.sp,
+                ),
+            )
+            Text(
+                text = "Price ${houses.Price}",
+                style = TextStyle(
+                    fontWeight = FontWeight.Medium,
+                    fontFamily = fontFamily,
+                    color = MaterialTheme.colorScheme.tertiary,
+                    fontSize = 15.sp,
+                ),
+            )
+            Row{
+                Icon(
+                    imageVector = Icons.Filled.LocationOn,
+                    contentDescription = null,
+                    tint = MaterialTheme.colorScheme.primary
+                )
+                Text(
+                    text = houses.Location,
+                    style = TextStyle(
+                        fontWeight = FontWeight.Medium,
+                        fontFamily = fontFamily,
+                        color = MaterialTheme.colorScheme.tertiary,
+                        fontSize = 15.sp,
+                    )
+                )
+            }
+            Button(
+                onClick = { /*TODO*/ },
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(start = 15.dp, end = 15.dp, bottom = 10.dp),
+                shape = RoundedCornerShape(15),
+                colors = ButtonDefaults.buttonColors(MaterialTheme.colorScheme.secondary)
+            ) {
+                Text(
+                    text = "Check",
+                    style = TextStyle(
+                        fontWeight = FontWeight.SemiBold,
+                        fontFamily = fontFamily,
+                        color = MaterialTheme.colorScheme.primary,
+                        fontSize = 16.sp,
+                    )
+                )
+            }
         }
     }
 }
