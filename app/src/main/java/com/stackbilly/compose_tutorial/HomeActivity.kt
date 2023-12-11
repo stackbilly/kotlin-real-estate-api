@@ -1,5 +1,6 @@
 package com.stackbilly.compose_tutorial
 
+import android.content.Context
 import android.util.Log
 import android.widget.Toast
 import androidx.compose.foundation.layout.Arrangement
@@ -126,29 +127,13 @@ fun HomeActivity(){
 
 @Composable
 fun ScrollContent(innerPadding: PaddingValues){
-    val retrofitClient = RetrofitClient
     val ctx = LocalContext.current
+    DBHandler(ctx)
     var housesData by remember {
         mutableStateOf<List<Houses>>(emptyList())
     }
-    retrofitClient.getApiService(ctx).getHouses()
-        .enqueue(object : Callback<ApiHouseResponse> {
-            override fun onResponse(
-                call: Call<ApiHouseResponse>,
-                response: Response<ApiHouseResponse>
-            ) {
-                if (response.isSuccessful) {
-                    housesData = response.body()!!.results
-                    Log.e("Real Estate", "$housesData")
-                }else{
-                    Toast.makeText(ctx, response.message(), Toast.LENGTH_SHORT).show()
-                }
-            }
-            override fun onFailure(call: Call<ApiHouseResponse>, t: Throwable) {
-                Toast.makeText(ctx, "${t.message}", Toast.LENGTH_SHORT).show()
-                Log.e("Real Estate", "onFailure ${t.message}")
-            }
-        })
+    housesData = writeHouseDataToDB(ctx)
+    println(housesData)
     LazyColumn(
         modifier = Modifier
             .padding(top = 60.dp)
@@ -169,6 +154,32 @@ fun ScrollContent(innerPadding: PaddingValues){
             }
         }
     }
+}
+
+fun writeHouseDataToDB(ctx: Context):List<Houses>{
+    val dbHandler = DBHandler(ctx)
+    var housesData:MutableList<Houses> = mutableListOf()
+    val retrofitClient = RetrofitClient
+    retrofitClient.getApiService(ctx).getHouses()
+        .enqueue(object : Callback<ApiHouseResponse> {
+            override fun onResponse(
+                call: Call<ApiHouseResponse>,
+                response: Response<ApiHouseResponse>
+            ) {
+                if (response.isSuccessful) {
+                    dbHandler.addNewHouse(response.body()!!.results)
+                    housesData = dbHandler.readHouses()
+                    Log.e("Real Estate", "${response.body()!!.results}")
+                }else{
+                    Toast.makeText(ctx, response.message(), Toast.LENGTH_SHORT).show()
+                }
+            }
+            override fun onFailure(call: Call<ApiHouseResponse>, t: Throwable) {
+                Toast.makeText(ctx, "${t.message}", Toast.LENGTH_SHORT).show()
+                Log.e("Real Estate", "onFailure ${t.message}")
+            }
+        })
+    return housesData
 }
 
 @Composable
