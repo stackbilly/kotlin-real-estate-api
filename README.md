@@ -5,6 +5,7 @@ This simple kotlin application illustrates how this real estate [api](https://gi
 - [Introduction](#introduction)
 - [Tools](#tools)
 - [Usage](#usage)
+- [Screenshots](#screenshots)
 - [Contribution](#contributions)
 - [License](#license)
 
@@ -23,6 +24,10 @@ Clone this repository by running the following command
 ```bash
 git clone https://github.com/stackbilly/kotlin-real-estate-api.git
 ```
+## Screenshots
+- ![Screenshot 1](https://github.com/stackbilly/kotlin-real-estate-api/blob/main/app/src/main/res/drawable/screenshot1.png)
+- ![Screenshot 2](https://github.com/stackbilly/kotlin-real-estate-api/blob/main/app/src/main/res/drawable/screenshot2.png)
+
 ## Contributions
 
 We welcome and appreciate contributions from the community. If you'd like to contribute to this project, please follow the correct guidelines.
