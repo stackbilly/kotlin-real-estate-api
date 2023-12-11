@@ -5,7 +5,6 @@ This simple kotlin application illustrates how this real estate [api](https://gi
 - [Introduction](#introduction)
 - [Tools](#tools)
 - [Usage](#usage)
-- [Impementation](#implementation)
 - [Contribution](#contributions)
 - [License](#license)
 
@@ -22,5 +21,13 @@ In this project I build a real estate application with Kotlin that consumes an A
 ## Usage
 Clone this repository by running the following command
 ```bash
-git clone 
+git clone https://github.com/stackbilly/kotlin-real-estate-api.git
 ```
+## Contributions
+
+We welcome and appreciate contributions from the community. If you'd like to contribute to this project, please follow the correct guidelines.
+We will review your PR and provide feedback. Your contributions will help improve and grow this project, and we are grateful for your support!
+Thank you for considering contributing to this project.
+
+## License
+This project is licensed under the [MIT License](LICENSE) - see the [LICENSE](LICENSE) file for details
