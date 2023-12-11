@@ -5,6 +5,7 @@ import retrofit2.Call
 import retrofit2.http.GET
 import retrofit2.http.Headers
 
+//api service
 interface ApiService {
     @GET("api/houses")
     @Headers("Content-Type: application/json")
