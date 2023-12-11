@@ -1,2 +1,2 @@
 # kotlin-real-estate-api
-A simple kotlin app consuming a real estate api endpoint using retrofit
+This simple kotlin application illustrates how this real estate api can be consumed using retrofit
