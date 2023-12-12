@@ -25,8 +25,12 @@ Clone this repository by running the following command
 git clone https://github.com/stackbilly/kotlin-real-estate-api.git
 ```
 ## Screenshots
-- ![Screenshot 1](https://github.com/stackbilly/kotlin-real-estate-api/blob/main/app/src/main/res/drawable/screenshot1.png)
-- ![Screenshot 2](https://github.com/stackbilly/kotlin-real-estate-api/blob/main/app/src/main/res/drawable/screenshot2.png)
+<table>
+  <tr>
+    <td style="padding-right: 10px;"><img src="https://github.com/stackbilly/kotlin-real-estate-api/blob/main/app/src/main/res/drawable/screenshot1.png" alt="Screenshot 1"></td>
+    <td style="padding-left: 10px;"><img src="https://github.com/stackbilly/kotlin-real-estate-api/blob/main/app/src/main/res/drawable/screenshot2.png" alt="Screenshot 2"></td>
+  </tr>
+</table>
 
 ## Contributions
 
