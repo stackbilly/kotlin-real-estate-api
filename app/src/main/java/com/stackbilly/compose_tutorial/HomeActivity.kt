@@ -1,6 +1,5 @@
 package com.stackbilly.compose_tutorial
 
-import android.content.Context
 import android.util.Log
 import android.widget.Toast
 import androidx.compose.foundation.layout.Arrangement
@@ -12,10 +11,8 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
@@ -47,6 +44,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
@@ -55,13 +53,12 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
-import com.google.gson.Gson
 import com.stackbilly.compose_tutorial.models.ApiHouseResponse
 import com.stackbilly.compose_tutorial.models.Houses
 import com.stackbilly.compose_tutorial.retrofit.RetrofitClient
 import retrofit2.Call
-import retrofit2.Response
 import retrofit2.Callback
+import retrofit2.Response
 
 val fontFamily = FontFamily(
     Font(R.font.montserrat_regular, FontWeight.Normal),
@@ -128,12 +125,28 @@ fun HomeActivity(){
 @Composable
 fun ScrollContent(innerPadding: PaddingValues){
     val ctx = LocalContext.current
-    DBHandler(ctx)
     var housesData by remember {
         mutableStateOf<List<Houses>>(emptyList())
     }
-    housesData = writeHouseDataToDB(ctx)
-    println(housesData)
+    val retrofitClient = RetrofitClient
+    retrofitClient.getApiService(ctx).getHouses()
+        .enqueue(object : Callback<ApiHouseResponse> {
+            override fun onResponse(
+                call: Call<ApiHouseResponse>,
+                response: Response<ApiHouseResponse>
+            ) {
+                if (response.isSuccessful) {
+                    housesData = response.body()!!.results
+                    Log.e("Real Estate", "${response.body()!!.results}")
+                }else{
+                    Toast.makeText(ctx, response.message(), Toast.LENGTH_SHORT).show()
+                }
+            }
+            override fun onFailure(call: Call<ApiHouseResponse>, t: Throwable) {
+                Toast.makeText(ctx, "${t.message}", Toast.LENGTH_SHORT).show()
+                Log.e("Real Estate", "onFailure ${t.message}")
+            }
+        })
     LazyColumn(
         modifier = Modifier
             .padding(top = 60.dp)
@@ -156,34 +169,9 @@ fun ScrollContent(innerPadding: PaddingValues){
     }
 }
 
-fun writeHouseDataToDB(ctx: Context):List<Houses>{
-    val dbHandler = DBHandler(ctx)
-    var housesData:MutableList<Houses> = mutableListOf()
-    val retrofitClient = RetrofitClient
-    retrofitClient.getApiService(ctx).getHouses()
-        .enqueue(object : Callback<ApiHouseResponse> {
-            override fun onResponse(
-                call: Call<ApiHouseResponse>,
-                response: Response<ApiHouseResponse>
-            ) {
-                if (response.isSuccessful) {
-                    dbHandler.addNewHouse(response.body()!!.results)
-                    housesData = dbHandler.readHouses()
-                    Log.e("Real Estate", "${response.body()!!.results}")
-                }else{
-                    Toast.makeText(ctx, response.message(), Toast.LENGTH_SHORT).show()
-                }
-            }
-            override fun onFailure(call: Call<ApiHouseResponse>, t: Throwable) {
-                Toast.makeText(ctx, "${t.message}", Toast.LENGTH_SHORT).show()
-                Log.e("Real Estate", "onFailure ${t.message}")
-            }
-        })
-    return housesData
-}
-
 @Composable
 fun HouseCard(houses:Houses){
+    val uriHandler = LocalUriHandler.current
     Card(
         modifier = Modifier
             .fillMaxWidth()
@@ -239,7 +227,7 @@ fun HouseCard(houses:Houses){
                 )
             }
             Button(
-                onClick = { /*TODO*/ },
+                onClick = { uriHandler.openUri("https://www.buyrentkenya.com${houses.Url}") },
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(start = 15.dp, end = 15.dp, bottom = 10.dp),
